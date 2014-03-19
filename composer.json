@@ -1,0 +1,21 @@
+{
+    "name": "YAM/YAM",
+    "description": "The YAM Framework",
+    "keywords": ["framework", "yam"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Domenic Muskulus",
+            "email": "domenic@muskulus.eu"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "YAM\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "doctrine/annotations": "v1.1.2"
+    }
+}
