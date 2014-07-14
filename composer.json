@@ -1,6 +1,6 @@
 {
-    "name": "YAM/YAM",
-    "description": "The YAM Framework",
+    "name": "domu1de/YAM",
+    "description": "A PHP web-application framework",
     "keywords": ["framework", "yam"],
     "license": "MIT",
     "authors": [
@@ -15,7 +15,13 @@
         }
     },
     "require": {
-        "php": ">=5.4.0",
-        "doctrine/annotations": "v1.1.2"
+        "php": ">=5.5.0",
+        "doctrine/annotations": "v1.1.2",
+        "tedivm/stash": "v0.12.1",
+        "psr/log": "1.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.1.*",
+        "satooshi/php-coveralls": "dev-master"
     }
 }
