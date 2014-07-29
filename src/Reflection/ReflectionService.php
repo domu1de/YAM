@@ -9,8 +9,6 @@
 
 namespace YAM\Reflection;
 
-use YAM\Annotations as YAM;
-
 /**
  * @YAM\Scope("singleton")
  */
@@ -49,18 +47,8 @@ class ReflectionService
      */
     public function getClassAnnotations($className, $annotationClassName = null)
     {
-        $annotations = [];
         $classAnnotations = $this->annotationReader->getClassAnnotations(new ClassReflection($className));
-        if ($annotationClassName === null) {
-            return $classAnnotations;
-        } else {
-            foreach ($classAnnotations as $annotation) {
-                if ($annotation instanceof $annotationClassName) {
-                    $annotations[] = $annotation;
-                }
-            }
-            return $annotations;
-        }
+        return $this->filterAnnotations($classAnnotations, $annotationClassName);
     }
 
     /**
@@ -101,18 +89,8 @@ class ReflectionService
      */
     public function getMethodAnnotations($className, $methodName, $annotationClassName = null)
     {
-        $annotations = [];
         $methodAnnotations = $this->annotationReader->getMethodAnnotations(new MethodReflection($className, $methodName));
-        if ($annotationClassName === null) {
-            return $methodAnnotations;
-        } else {
-            foreach ($methodAnnotations as $annotation) {
-                if ($annotation instanceof $annotationClassName) {
-                    $annotations[] = $annotation;
-                }
-            }
-            return $annotations;
-        }
+        return $this->filterAnnotations($methodAnnotations, $annotationClassName);
     }
 
     /**
@@ -222,18 +200,8 @@ class ReflectionService
      */
     public function getPropertyAnnotations($className, $propertyName, $annotationClassName = null)
     {
-        $annotations = [];
         $propertyAnnotations = $this->annotationReader->getPropertyAnnotations(new PropertyReflection($className, $propertyName));
-        if ($annotationClassName === null) {
-            return $propertyAnnotations;
-        } else {
-            foreach ($propertyAnnotations as $annotation) {
-                if ($annotation instanceof $annotationClassName) {
-                    $annotations[] = $annotation;
-                }
-            }
-            return $annotations;
-        }
+        return $this->filterAnnotations($propertyAnnotations, $annotationClassName);
     }
 
     /**
@@ -306,14 +274,34 @@ class ReflectionService
     public function getPropertiesAnnotatedWith($className, $annotationClassName, $filter = null)
     {
         $clazz = new ClassReflection($className);
-        $properties = $filter === null ? $clazz->getProperties() : $clazz->getProperties($filter);
         $annotatedProperties = [];
 
+        $properties = $filter === null ? $clazz->getProperties() : $clazz->getProperties($filter);
         foreach ($properties as $property) {
             if ($this->isPropertyAnnotatedWith($className, $property->getName(), $annotationClassName)) {
                 $annotatedProperties[] = $property;
             }
         }
         return $annotatedProperties;
+    }
+
+    /**
+     * @param array $annotations
+     * @param string $annotationClassName
+     * @return array
+     */
+    private function filterAnnotations($annotations, $annotationClassName)
+    {
+        if ($annotationClassName === null) {
+            return $annotations;
+        } else {
+            $filteredAnnotations = [];
+            foreach ($annotations as $annotation) {
+                if ($annotation instanceof $annotationClassName) {
+                    $filteredAnnotations[] = $annotation;
+                }
+            }
+            return $filteredAnnotations;
+        }
     }
 }
