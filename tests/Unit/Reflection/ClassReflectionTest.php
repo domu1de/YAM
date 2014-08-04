@@ -13,11 +13,10 @@ namespace YAM\UnitTest\Reflection;
 use YAM\Reflection\ClassReflection;
 use YAM\Reflection\MethodReflection;
 use YAM\Reflection\PropertyReflection;
+use YAM\UnitTest\Reflection\Fixtures\SampleClass;
 
 class ClassReflectionTest extends \PHPUnit_Framework_TestCase
 {
-    private $testProperty;
-
     /**
      * @test
      */
@@ -53,18 +52,29 @@ class ClassReflectionTest extends \PHPUnit_Framework_TestCase
      */
     public function getMethodShouldReturnMethodReflection()
     {
-        $class = new ClassReflection($this);
-        $this->assertInstanceOf(MethodReflection::class, $class->getMethod('getConstructorShouldReturnMethodReflection'));
+        $class = new ClassReflection(SampleClass::class);
+        $this->assertInstanceOf(MethodReflection::class, $class->getMethod('fakeMethod'));
     }
 
     /**
      * @test
-     * TODO: test filter
      */
     public function getMethodsShouldReturnArrayOfMethodReflection()
     {
-        $class = new ClassReflection($this);
+        $class = new ClassReflection(SampleClass::class);
         $this->assertContainsOnlyInstancesOf(MethodReflection::class, $class->getMethods());
+    }
+
+    /**
+     * @test
+     */
+    public function getMethodsShouldRespectFilterArgument()
+    {
+        $class = new ClassReflection(SampleClass::class);
+        $methods = $class->getMethods(MethodReflection::IS_PRIVATE | MethodReflection::IS_STATIC);
+        $this->assertContainsOnlyInstancesOf(MethodReflection::class, $methods);
+        $this->assertCount(1, $methods);
+        $this->assertEquals('fakeMethod', $methods[0]->name);
     }
 
     /**
@@ -72,18 +82,29 @@ class ClassReflectionTest extends \PHPUnit_Framework_TestCase
      */
     public function getPropertyShouldReturnPropertyReflection()
     {
-        $class = new ClassReflection($this);
+        $class = new ClassReflection(SampleClass::class);
         $this->assertInstanceOf(PropertyReflection::class, $class->getProperty('testProperty'));
     }
 
     /**
      * @test
-     * TODO: test filter
      */
     public function getPropertiesShouldReturnArrayOfPropertyReflection()
     {
-        $class = new ClassReflection($this);
+        $class = new ClassReflection(SampleClass::class);
         $this->assertContainsOnlyInstancesOf(PropertyReflection::class, $class->getProperties());
+    }
+
+    /**
+     * @test
+     */
+    public function getPropertiesShouldRespectFilterArgument()
+    {
+        $class = new ClassReflection(SampleClass::class);
+        $properties = $class->getProperties(PropertyReflection::IS_PROTECTED);
+        $this->assertContainsOnlyInstancesOf(PropertyReflection::class, $properties);
+        $this->assertCount(1, $properties);
+        $this->assertEquals('testProperty3', $properties[0]->name);
     }
 }
  

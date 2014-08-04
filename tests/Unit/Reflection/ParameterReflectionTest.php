@@ -12,31 +12,68 @@ namespace YAM\UnitTest\Reflection;
 
 use YAM\Reflection\ClassReflection;
 use YAM\Reflection\ParameterReflection;
+use YAM\UnitTest\Reflection\Fixtures\SampleClass;
 
 class ParameterReflectionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetType()
+    /**
+     * @test
+     */
+    public function getTypeShouldReturnNullIfNoType()
     {
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithoutType'], 'a');
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithoutType'], 'a');
         $this->assertNull($parameter->getType());
+    }
 
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithTypeHint'], 'a');
+    /**
+     * @test
+     */
+    public function getTypeShouldReturnTypeFromTypeHint()
+    {
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithTypeHint'], 'a');
         $this->assertEquals('stdClass', $parameter->getType());
 
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithPhpDoc'], 'a');
-        $this->assertEquals('stdClass', $parameter->getType());
-
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithArrayType'], 'a');
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithArrayType'], 'a');
         $this->assertEquals('array', $parameter->getType());
 
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithArrayTypeAndPhpDoc'], 'a');
-        $this->assertEquals('stdClass[]', $parameter->getType());
-
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithArrayTypeAndUnmatchedPhpDoc'], 'a');
-        $this->assertEquals('array', $parameter->getType());
-
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithCallableTypeHint'], 'a');
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithCallableTypeHint'], 'a');
         $this->assertEquals('callable', $parameter->getType());
+    }
+
+    /**
+     * @test
+     */
+    public function getTypeShouldReturnTypeFromPhpDoc()
+    {
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithPhpDoc'], 'a');
+        $this->assertEquals('stdClass', $parameter->getType());
+    }
+
+    /**
+     * @test
+     */
+    public function getTypeShouldReturnTypeSpecificArrayTypeIfPossible()
+    {
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithArrayTypeAndPhpDoc'], 'a');
+        $this->assertEquals('stdClass[]', $parameter->getType());
+    }
+
+    /**
+     * @test
+     */
+    public function getTypeShouldReturnArrayIfPhpDocIsNotMatchingParam()
+    {
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithArrayTypeAndUnmatchedPhpDoc'], 'a');
+        $this->assertEquals('array', $parameter->getType());
+    }
+
+    /**
+     * @test
+     */
+    public function getTypeShouldIgnorePhpDocIfTypeHintIsPresent()
+    {
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithTypeHintAndPhpDoc'], 'a');
+        $this->assertEquals('stdClass', $parameter->getType());
     }
 
     /**
@@ -44,7 +81,7 @@ class ParameterReflectionTest extends \PHPUnit_Framework_TestCase
      */
     public function getDeclaringClassShouldReturnClassReflection()
     {
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithoutType'], 'a');
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithoutType'], 'a');
         $this->assertInstanceOf(ClassReflection::class, $parameter->getDeclaringClass());
     }
 
@@ -62,7 +99,7 @@ class ParameterReflectionTest extends \PHPUnit_Framework_TestCase
      */
     public function getClassShouldReturnClassReflection()
     {
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithTypeHint'], 'a');
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithTypeHint'], 'a');
         $this->assertInstanceOf(ClassReflection::class, $parameter->getClass());
     }
 
@@ -71,62 +108,17 @@ class ParameterReflectionTest extends \PHPUnit_Framework_TestCase
      */
     public function getClassShouldReturnNullForNonObjectType()
     {
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithPhpDoc'], 'a');
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithPhpDoc'], 'a');
         $this->assertNull($parameter->getClass());
 
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithoutType'], 'a');
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithoutType'], 'a');
         $this->assertNull($parameter->getClass());
 
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithArrayType'], 'a');
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithArrayType'], 'a');
         $this->assertNull($parameter->getClass());
 
-        $parameter = new ParameterReflection([SampleClass2::class, 'methodWithCallableTypeHint'], 'a');
+        $parameter = new ParameterReflection([SampleClass::class, 'methodWithCallableTypeHint'], 'a');
         $this->assertNull($parameter->getClass());
-    }
-}
-
-class SampleClass2
-{
-    public function methodWithTypeHint(\stdClass $a)
-    {
-    }
-
-    /**
-     * @param \stdClass $a
-     */
-    public function methodWithPhpDoc($a)
-    {
-    }
-
-    public function methodWithoutType($a)
-    {
-
-    }
-
-    public function methodWithArrayType(array $a)
-    {
-
-    }
-
-    /**
-     * @param \stdClass[] $a
-     */
-    public function methodWithArrayTypeAndPhpDoc(array $a)
-    {
-
-    }
-
-    /**
-     * @param int $b
-     */
-    public function methodWithArrayTypeAndUnmatchedPhpDoc(array $a, $b)
-    {
-
-    }
-
-    public function methodWithCallableTypeHint(callable $a)
-    {
-
     }
 }
 

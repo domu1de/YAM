@@ -14,12 +14,28 @@ use YAM\Reflection\PropertyReflection;
 
 class PropertyReflectionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetType()
-    {
-        $property = new PropertyReflection(SampleClass1::class, 'propertyWithType');
-        $this->assertEquals('stdClass', $property->getType());
+    /**
+     * @var \stdClass
+     */
+    private $propertyWithType;
 
-        $property = new PropertyReflection(SampleClass1::class, 'propertyWithoutType');
+    private $propertyWithoutType;
+
+    /**
+     * @test
+     */
+    public function getTypeShouldReturnTypeIfTypeIsPresent()
+    {
+        $property = new PropertyReflection(self::class, 'propertyWithType');
+        $this->assertEquals('stdClass', $property->getType());
+    }
+
+    /**
+     * @test
+     */
+    public function getTypeShouldReturnNullIfNoType()
+    {
+        $property = new PropertyReflection(self::class, 'propertyWithoutType');
         $this->assertNull($property->getType());
     }
 
@@ -33,14 +49,3 @@ class PropertyReflectionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ClassReflection::class, $property->getDeclaringClass());
     }
 }
-
-class SampleClass1
-{
-    /**
-     * @var \stdClass
-     */
-    private $propertyWithType;
-
-    private $propertyWithoutType;
-}
- 
