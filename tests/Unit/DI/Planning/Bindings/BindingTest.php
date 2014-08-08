@@ -59,11 +59,11 @@ class BindingTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('binding from stdClass to constant value', (string) $binding);
 
         $binding->setTarget(BindingTarget::PROVIDER());
-        $provider = function() {};
+        $provider = new \stdClass();
         $binding->setProviderCallback(function() use ($provider) {
             return $provider;
         });
-        $this->assertEquals(sprintf('provider binding from stdClass to stdClass2 (via %s)', \Closure::class), (string) $binding);
+        $this->assertEquals(sprintf('provider binding from stdClass to stdClass2 (via %s)', get_class($provider)), (string) $binding);
 
         $binding->setCondition(function(){});
         $this->assertStringStartsWith('conditional ', (string) $binding);
