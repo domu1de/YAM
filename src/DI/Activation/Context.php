@@ -9,11 +9,12 @@
 
 namespace YAM\DI\Activation;
 
+use YAM\Annotations\Singleton;
 use YAM\DI\Exception\ActivationException;
 use YAM\DI\Exception\ExceptionFormatter;
 use YAM\DI\ObjectManager;
 use YAM\DI\Planning\Bindings;
-use YAM\DI\Scope;
+use YAM\Reflection\ReflectionService;
 
 /**
  * Contains information about the activation of a single instance.
@@ -55,28 +56,35 @@ class Context
     private $strategyPipeline;
 
     /**
-     * @var \YAM\DI\Scope
-     */
-    private $scope;
-
-    /**
      * @var \YAM\DI\Planning\Plan
      */
     private $plan;
+
+    /**
+     * @var bool
+     */
+    private $inSingletonScope;
+
+    /**
+     * @var \YAM\DI\Planning\Planner
+     */
+    private $planner;
 
     /**
      * @param \YAM\DI\ObjectManager $objectManager
      * @param \YAM\DI\Activation\Request $request
      * @param \YAM\DI\Planning\Bindings\Binding $binding
      * @param \SplObjectStorage $instanceCache
+     * @param \YAM\DI\Planning\Planner $planner
      * @param \YAM\DI\Activation\Strategies\ActivationStrategy[] $activationStrategies
      */
-    public function __construct($objectManager, $request, $binding, \SplObjectStorage $instanceCache, array $activationStrategies)
+    public function __construct($objectManager, $request, $binding, \SplObjectStorage $instanceCache, $planner, array $activationStrategies)
     {
         $this->objectManager = $objectManager;
         $this->request = $request;
         $this->binding = $binding;
 
+        $this->planner = $planner;
         $this->instanceCache = $instanceCache;
         $this->strategyPipeline = $activationStrategies;
 
@@ -111,8 +119,12 @@ class Context
 
         $instance = $this->getProvider()->create($this);
 
-        if ($this->scope == Scope::SINGLETON()) {
+        if ($this->inSingletonScope()) {
             $this->instanceCache[$this->binding] = $instance;
+        }
+
+        if ($this->plan === null) {
+            $this->plan = $this->planner->getPlan(get_class($instance));
         }
 
         foreach ($this->strategyPipeline as $strategy) {
@@ -124,9 +136,22 @@ class Context
         return $instance;
     }
 
-    public function getScope()
+    /**
+     * @return bool
+     */
+    public function inSingletonScope()
     {
-        return $this->request->getScope() ?: $this->binding->getScope();
+        if ($this->inSingletonScope !== null) {
+            return $this->inSingletonScope;
+        }
+
+        if ($this->binding->isSingleton() !== null) {
+            return $this->inSingletonScope = $this->binding->isSingleton();
+        }
+
+        $reflectionService = $this->objectManager->getComponents()->get(ReflectionService::class);
+
+        return $reflectionService->isClassAnnotatedWith($this->binding->getImplementationType(), Singleton::class);
     }
 
     /**

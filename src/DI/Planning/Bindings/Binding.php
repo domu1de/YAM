@@ -9,8 +9,6 @@
 
 namespace YAM\DI\Planning\Bindings;
 
-
-
 /**
  * Contains information about a service registration.
  *
@@ -29,9 +27,9 @@ class Binding
     private $target;
 
     /**
-     * @var \YAM\DI\Scope
+     * @var bool
      */
-    private $scope;
+    private $isSingleton;
 
     /**
      * @var string
@@ -75,22 +73,6 @@ class Binding
     public function matches(\YAM\DI\Activation\Request $request)
     {
         return $this->condition === null || call_user_func($this->condition, $request);
-    }
-
-    /**
-     * @return \YAM\DI\Scope
-     */
-    public function getScope()
-    {
-        return $this->scope;
-    }
-
-    /**
-     * @param \YAM\DI\Scope $scope
-     */
-    public function setScope($scope)
-    {
-        $this->scope = $scope;
     }
 
     /**
@@ -189,6 +171,22 @@ class Binding
     public function setCondition($condition)
     {
         $this->condition = $condition;
+    }
+
+    /**
+     * @return bool|null Return TRUE or FALSE if scope was explicitly set, otherwise NULL.
+     */
+    public function isSingleton()
+    {
+        return $this->isSingleton;
+    }
+
+    /**
+     * @param bool $isSingleton
+     */
+    public function setIsSingleton($isSingleton)
+    {
+        $this->isSingleton = $isSingleton;
     }
 
     public function __toString()

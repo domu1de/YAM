@@ -209,7 +209,7 @@ abstract class ObjectManager
 
         $binding = new Binding($type);
         $request = new Request($type, null, [], false, false);
-        $context = new Context($this, $request, $binding, $this->instances, $activationPipeline);
+        $context = new Context($this, $request, $binding, $this->instances, $this->components->get(Planner::class), $activationPipeline);
 
         $context->setPlan($planner->getPlan($type));
 
@@ -239,7 +239,7 @@ abstract class ObjectManager
 
         $resolvedServices = [];
         foreach ($satisfiedBindings as $binding) {
-            $context = new Context($this, $request, $binding, $this->instances, $this->components->getAll(ActivationStrategy::class));
+            $context = new Context($this, $request, $binding, $this->instances, $this->components->get(Planner::class), $this->components->getAll(ActivationStrategy::class));
             $resolvedServices[] = $context->resolve();
         }
 
@@ -287,7 +287,7 @@ abstract class ObjectManager
     {
         $binding = new Binding(self::class);
         $builder = new BindingBuilder($binding);
-        $builder->toConstant($this)->in(Scope::PROTOTYPE());
+        $builder->toConstant($this)->inTransientScope();
 
         $this->addBinding($binding);
     }

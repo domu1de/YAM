@@ -17,7 +17,6 @@ use YAM\DI\Activation\Providers\Provider;
 use YAM\DI\Planning\Bindings\Binding;
 use YAM\DI\Planning\Bindings\BindingBuilder;
 use YAM\DI\Planning\Bindings\BindingTarget;
-use YAM\DI\Scope;
 
 class BindingBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -76,7 +75,7 @@ class BindingBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('stdClass', $binding->getService());
         $this->assertEquals('stdClass', $binding->getImplementationType());
         $this->assertEquals(BindingTarget::CONSTANT(), $binding->getTarget());
-        $this->assertEquals(Scope::SINGLETON(), $binding->getScope());
+        $this->assertTrue($binding->isSingleton());
         $this->assertInstanceOf(ConstantProvider::class, $binding->getProvider($this->getContextMock()));
         $this->assertEquals(10, $binding->getProvider($this->getContextMock())->create($this->getContextMock()));
     }
@@ -111,27 +110,25 @@ class BindingBuilderTest extends \PHPUnit_Framework_TestCase
         $bindingBuilder = new BindingBuilder($binding);
         $bindingBuilder->inSingletonScope();
 
-        $this->assertEquals(Scope::SINGLETON(), $binding->getScope());
+        $this->assertTrue($binding->isSingleton());
     }
 
-    public function testScopeDefinition()
+    public function testInTransientScope()
     {
         $binding = new Binding('stdClass');
         $bindingBuilder = new BindingBuilder($binding);
-        $bindingBuilder->to('YAM\TestClass')->in(Scope::SINGLETON());
+        $bindingBuilder->inTransientScope();
 
-        $this->assertEquals(Scope::SINGLETON(), $binding->getScope());
-        $this->assertEquals(BindingTarget::TYPE(), $binding->getTarget());
+        $this->assertFalse($binding->isSingleton());
     }
 
-    public function testNoScopeDefinition()
+    public function testNoExplicitScope()
     {
         $binding = new Binding('stdClass');
         $bindingBuilder = new BindingBuilder($binding);
         $bindingBuilder->to('YAM\TestClass');
 
-        $this->assertNull($binding->getScope());
-        $this->assertEquals(BindingTarget::TYPE(), $binding->getTarget());
+        $this->assertNull($binding->isSingleton());
     }
 
     private function getContextMock()

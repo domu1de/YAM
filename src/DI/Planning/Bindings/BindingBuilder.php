@@ -13,7 +13,6 @@ namespace YAM\DI\Planning\Bindings;
 use YAM\DI\Activation\Providers\CallbackProvider;
 use YAM\DI\Activation\Providers\ConstantProvider;
 use YAM\DI\Activation\Providers\StandardProvider;
-use YAM\DI\Scope;
 
 /**
  * Provides a root for the fluent syntax associated with an YAM\DI\Bindings\Binding.
@@ -89,7 +88,7 @@ class BindingBuilder
     {
         $this->binding->setTarget(BindingTarget::CONSTANT());
         $this->binding->setImplementationType($this->binding->getService());
-        $this->binding->setScope(Scope::SINGLETON());
+        $this->binding->setIsSingleton(true);
         $this->binding->setProviderCallback(function() use ($constant) {
             return new ConstantProvider($constant);
         });
@@ -122,21 +121,19 @@ class BindingBuilder
      */
     public function inSingletonScope()
     {
-        $this->in(Scope::SINGLETON());
+        $this->binding->setIsSingleton(true);
         return $this;
     }
 
     /**
-     * Indicates that only a single instance of the binding should be created, and then
-     * should be re-used for all subsequent requests.
+     * Indicates that instances should not be re-used.
      *
-     * @param \YAM\DI\Scope $scope
      * @return $this
      * @api
      */
-    public function in(Scope $scope)
+    public function inTransientScope()
     {
-        $this->binding->setScope($scope);
+        $this->binding->setIsSingleton(false);
         return $this;
     }
 
