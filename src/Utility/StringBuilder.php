@@ -9,7 +9,11 @@
 
 namespace YAM\Utility;
 
-
+/**
+ * A mutable sequence of characters.
+ *
+ * @package YAM\Utility
+ */
 class StringBuilder
 {
     /**
@@ -21,13 +25,12 @@ class StringBuilder
      * Appends the (formatted) string to the sequence.
      *
      * @param string $string
-     * @param mixed $string,...
+     * @param mixed ...$args
      * @return $this
      * @api
      */
-    public function append($string)
+    public function append($string, ...$args)
     {
-        $args = array_slice(func_get_args(), 1);
         if (!empty($args)) {
             $string = vsprintf($string, $args);
         }
@@ -39,16 +42,16 @@ class StringBuilder
      * Appends the (formatted) string followed by a line terminator to the sequence.
      *
      * @param string $string
-     * @param mixed $string,...
+     * @param mixed ...$args
      * @return $this
+     * @api
      */
-    public function appendLine($string = '')
+    public function appendLine($string = '', ...$args)
     {
-        $args = array_slice(func_get_args(), 1);
         if (!empty($args)) {
             $string = vsprintf($string, $args);
         }
-        $this->internalString .= $string . PHP_EOL;
+        $this->internalString .= (string) $string . PHP_EOL;
         return $this;
     }
 
@@ -67,6 +70,7 @@ class StringBuilder
      * Removes all characters from the current StringBuilder instance.
      *
      * @return $this
+     * @api
      */
     public function clear()
     {
