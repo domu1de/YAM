@@ -17,6 +17,8 @@ use YAM\Annotations as YAM;
 use YAM\DI\Activation\Strategies\ActivationStrategy;
 use YAM\DI\Activation\Strategies\MethodInjectionStrategy;
 use YAM\DI\Activation\Strategies\PropertyInjectionStrategy;
+use YAM\DI\Planning\Bindings\Resolvers\JITBindingResolver;
+use YAM\DI\Planning\Bindings\Resolvers\MissingBindingResolver;
 use YAM\DI\Planning\Planner;
 use YAM\DI\Planning\Strategies\ConstructorReflectionStrategy;
 use YAM\DI\Planning\Strategies\MethodReflectionStrategy;
@@ -25,7 +27,7 @@ use YAM\DI\Planning\Strategies\PropertyReflectionStrategy;
 use YAM\Reflection\ReflectionService;
 
 /**
- * @YAM\Scope("singleton")
+ * @YAM\Singleton
  */
 class StandardObjectManager extends ObjectManager
 {
@@ -60,6 +62,8 @@ class StandardObjectManager extends ObjectManager
         $annotationReader = new SimpleAnnotationReader();
         $annotationReader->addNamespace('YAM\Annotations');
         $this->components->add(Reader::class, SimpleAnnotationReader::class, $annotationReader);
+
+        $this->components->add(MissingBindingResolver::class, JITBindingResolver::class);
 
         $this->components->add(ActivationStrategy::class, MethodInjectionStrategy::class);
         $this->components->add(ActivationStrategy::class, PropertyInjectionStrategy::class);
