@@ -9,7 +9,6 @@
 
 namespace YAM\DI;
 
-
 use YAM\DI\Activation\Context;
 use YAM\DI\Activation\Request;
 use YAM\DI\Activation\Strategies\ActivationStrategy;
@@ -17,12 +16,13 @@ use YAM\DI\Exception\ExceptionFormatter;
 use YAM\DI\Exception\PlanningException;
 use YAM\DI\Planning\Bindings\Binding;
 use YAM\DI\Planning\Bindings\BindingBuilder;
+use YAM\DI\Planning\Bindings\Resolvers\MissingBindingResolver;
 use YAM\DI\Planning\Planner;
 
 abstract class ObjectManager
 {
     /**
-     * Singleton instances indexed by classname.
+     * Singleton instances indexed by class name.
      *
      * @var \SplObjectStorage
      */
@@ -102,12 +102,12 @@ abstract class ObjectManager
             throw new PlanningException(ExceptionFormatter::noModuleLoadedWithTheSpecifiedName($moduleName));
         }
 
-        $this->modules[$moduleName]->onUnload($this);
+        $this->modules[$moduleName]->onUnload();
         unset($this->modules[$moduleName]);
     }
 
     /**
-     * Return TRUE if a module with the given namen exists.
+     * Return TRUE if a module with the given name exists.
      *
      * @param string $moduleName
      * @return boolean
@@ -227,9 +227,17 @@ abstract class ObjectManager
      */
     public function resolve($request)
     {
-        $satisfiedBindings = isset($this->bindings[$request->getService()]) ? array_filter($this->bindings[$request->getService()], $this->satisfiesRequest($request)) : $this->createJITBinding($request->getService());
+        $satisfiedBindings = array_filter($this->getBindings($request->getService()), $this->satisfiesRequest($request));
 
-        if (!$request->isOptional() && empty($satisfiedBindings)) {
+        if (empty($satisfiedBindings)) {
+            if ($this->handleMissingBinding($request)) {
+                return $this->resolve($request);
+            }
+
+            if ($request->isOptional()) {
+                return [];
+            }
+
             throw new PlanningException(ExceptionFormatter::couldNotResolveBinding($request));
         }
 
@@ -253,6 +261,16 @@ abstract class ObjectManager
      */
     abstract protected function addComponents();
 
+    /**
+     * Gets the bindings registered for the given service.
+     *
+     * @param string $service The service in question.
+     * @return Planning\Bindings\Binding[]
+     */
+    private function getBindings($service)
+    {
+        return isset($this->bindings[$service]) ? $this->bindings[$service] : [];
+    }
 
     /**
      * @param \YAM\DI\Activation\Request $request
@@ -260,27 +278,29 @@ abstract class ObjectManager
      */
     private function satisfiesRequest(Activation\Request $request)
     {
-        return function($binding) use ($request) {
+        return function(Binding $binding) use ($request) {
             return $binding->matches($request) && $request->matches($binding);
         };
     }
 
     /**
-     * @param string $service
-     * @return \YAM\DI\Planning\Bindings\Binding[]
+     * Handles missing bindings.
+     *
+     * @param \YAM\DI\Activation\Request $request
+     * @return boolean Returns TRUE if missing binding could be handled and FALSE if not
      */
-    private function createJITBinding($service)
+    private function handleMissingBinding($request)
     {
-        if (!interface_exists($service) && class_exists($service)) {
-            $binding = new Binding($service);
-            (new BindingBuilder($binding))->toSelf();
-
-            //$this->logger->debug('[ObjectManager] Created JIT-Binding for "{service}".', ['service' => $service]);
-
-            return [$binding];
+        $resolvers = $this->components->getAll(MissingBindingResolver::class);
+        foreach ($resolvers as $resolver) {
+            $bindings = $resolver->resolve($this->bindings, $request);
+            if (!empty($bindings)) {
+                $this->bindings[$request->getService()] = $bindings;
+                return true;
+            }
         }
 
-        return [];
+        return false;
     }
 
     private function bindObjectManager()
