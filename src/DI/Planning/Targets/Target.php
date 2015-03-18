@@ -59,7 +59,7 @@ abstract class Target
     }
 
     /**
-     * @return bool
+     * @return boolean
      */
     protected function isArray()
     {

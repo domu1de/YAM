@@ -10,7 +10,7 @@
 namespace YAM\Reflection;
 
 /**
- * @YAM\Scope("singleton")
+ * @YAM\Singleton
  */
 class ReflectionService
 {
@@ -29,7 +29,7 @@ class ReflectionService
      *
      * @param string $className Name of the class
      * @param string $annotationClassName Annotation to check for
-     * @return bool
+     * @return boolean
      * @api
      */
     public function isClassAnnotatedWith($className, $annotationClassName)
@@ -70,7 +70,7 @@ class ReflectionService
      * @param string $className Name of the class
      * @param string $methodName Name of the method
      * @param string $annotationClassName Annotation to check for
-     * @return bool
+     * @return boolean
      * @api
      */
     public function isMethodAnnotatedWith($className, $methodName, $annotationClassName)

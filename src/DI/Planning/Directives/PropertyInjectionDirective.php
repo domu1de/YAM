@@ -27,6 +27,11 @@ class PropertyInjectionDirective implements Directive
      */
     private $propertyInfo;
 
+    /**
+     * @param \YAM\Reflection\PropertyReflection $propertyInfo
+     * @param callable $propertyInjector
+     * @param \YAM\DI\Planning\Targets\Target $target
+     */
     public function __construct($propertyInfo, $propertyInjector, $target)
     {
         $this->propertyInfo = $propertyInfo;

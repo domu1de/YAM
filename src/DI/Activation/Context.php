@@ -61,7 +61,7 @@ class Context
     private $plan;
 
     /**
-     * @var bool
+     * @var boolean
      */
     private $inSingletonScope;
 
@@ -137,7 +137,7 @@ class Context
     }
 
     /**
-     * @return bool
+     * @return boolean
      */
     public function inSingletonScope()
     {

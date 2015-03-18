@@ -38,14 +38,14 @@ class Request
     /**
      * Indicates whether a single service is requested.
      *
-     * @var bool
+     * @var boolean
      */
     private $isUnique;
 
     /**
      * Indicated whether the request is optional.
      *
-     * @var bool
+     * @var boolean
      */
     private $isOptional;
 
@@ -80,8 +80,8 @@ class Request
      * @param string $service
      * @param callable|null $constraint
      * @param array $parameters
-     * @param bool $isUnique
-     * @param bool $isOptional
+     * @param boolean $isUnique
+     * @param boolean $isOptional
      */
     public function __construct($service, $constraint, array $parameters, $isUnique, $isOptional)
     {
@@ -100,7 +100,7 @@ class Request
      * Determines whether the given binding satisfies the request's constraints.
      *
      * @param \YAM\DI\Planning\Bindings\Binding $binding
-     * @return bool
+     * @return boolean
      */
     public function matches(\YAM\DI\Planning\Bindings\Binding $binding)
     {
@@ -113,8 +113,8 @@ class Request
      * @param string $service
      * @param \YAM\DI\Activation\Context $parentContext
      * @param \YAM\DI\Planning\Targets\Target $target
-     * @param bool $isUnique
-     * @param bool $isOptional
+     * @param boolean $isUnique
+     * @param boolean $isOptional
      * @return \YAM\DI\Activation\Request
      */
     public function createChild($service, $parentContext, $target, $isUnique, $isOptional)
@@ -160,7 +160,7 @@ class Request
     }
 
     /**
-     * @return bool
+     * @return boolean
      */
     public function isUnique()
     {
@@ -168,7 +168,7 @@ class Request
     }
 
     /**
-     * @return bool
+     * @return boolean
      */
     public function isOptional()
     {

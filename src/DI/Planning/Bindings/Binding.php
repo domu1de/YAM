@@ -27,7 +27,7 @@ class Binding
     private $target;
 
     /**
-     * @var bool
+     * @var boolean
      */
     private $isSingleton;
 
@@ -68,7 +68,7 @@ class Binding
      * Determines whether the given request satisfies the binding's conditions.
      *
      * @param \YAM\DI\Activation\Request $request
-     * @return bool
+     * @return boolean
      */
     public function matches(\YAM\DI\Activation\Request $request)
     {
@@ -174,7 +174,7 @@ class Binding
     }
 
     /**
-     * @return bool|null Return TRUE or FALSE if scope was explicitly set, otherwise NULL.
+     * @return boolean|null Returns TRUE or FALSE if scope was explicitly set, otherwise NULL.
      */
     public function isSingleton()
     {
@@ -182,7 +182,7 @@ class Binding
     }
 
     /**
-     * @param bool $isSingleton
+     * @param boolean $isSingleton
      */
     public function setIsSingleton($isSingleton)
     {

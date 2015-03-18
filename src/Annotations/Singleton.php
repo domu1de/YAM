@@ -10,7 +10,7 @@
 namespace YAM\Annotations;
 
 /**
- * Indicates that a class should be used as a singleton
+ * Indicates that a class should be treated as a singleton
  * by the dependency injection framework.
  *
  * @Annotation
