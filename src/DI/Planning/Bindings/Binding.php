@@ -72,7 +72,8 @@ class Binding
      */
     public function matches(\YAM\DI\Activation\Request $request)
     {
-        return $this->condition === null || call_user_func($this->condition, $request);
+        $condition = $this->condition;
+        return $this->condition === null || $condition($request);
     }
 
     /**
@@ -154,7 +155,8 @@ class Binding
      */
     public function getProvider($context)
     {
-        return call_user_func($this->providerCallback, $context);
+        $providerCallback = $this->providerCallback;
+        return $providerCallback($context);
     }
 
     /**

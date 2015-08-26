@@ -29,7 +29,8 @@ class MethodReflectionStrategy extends MethodReflectionStrategyBase
             }
 
             $plan->add(new MethodInjectionDirective($method, function ($target, $args = []) use ($method) {
-                $method->invokeArgs($target, $args);
+                $methodName = $method->getName();
+                $target->$methodName(...$args);
             }, $this->createTargetsFromParameters($method)));
         }
     }

@@ -24,6 +24,7 @@ class CallbackProvider implements Provider
 
     public function create(\YAM\DI\Activation\Context $context)
     {
-        return call_user_func($this->method, $context);
+        $method = $this->method;
+        return $method($context);
     }
 } 

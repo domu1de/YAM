@@ -104,6 +104,7 @@ class BindingBuilder
      */
     public function toMethod(callable $method)
     {
+        // TODO static callable string is not supported before PHP7
         $this->binding->setTarget(BindingTarget::METHOD());
         $this->binding->setImplementationType($this->binding->getService());
         $this->binding->setProviderCallback(function() use ($method) {

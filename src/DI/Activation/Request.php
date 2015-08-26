@@ -104,7 +104,8 @@ class Request
      */
     public function matches(\YAM\DI\Planning\Bindings\Binding $binding)
     {
-        return $this->constraint === null || call_user_func($this->constraint, $binding);
+        $constraint = $this->constraint;
+        return $this->constraint === null || $constraint($binding);
     }
 
     /**
